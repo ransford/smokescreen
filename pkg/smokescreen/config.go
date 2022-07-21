@@ -235,6 +235,7 @@ func NewConfig() *Config {
 }
 
 func (config *Config) SetupCrls(crlFiles []string) error {
+	// TODO(ransford): why so many failure conditions ignored?
 	for _, crlFile := range crlFiles {
 		crlBytes, err := ioutil.ReadFile(crlFile)
 		if err != nil {
@@ -263,7 +264,7 @@ func (config *Config) SetupCrls(crlFiles []string) error {
 			}
 		}
 		if crlIssuerId == "" {
-			log.Print(fmt.Errorf("error: CRL from '%s' has no Authority Key Identifier: ignoring it\n", crlFile))
+			log.Warnf("CRL from '%s' has no Authority Key Identifier: ignoring it", crlFile)
 			continue
 		}
 
@@ -271,21 +272,21 @@ func (config *Config) SetupCrls(crlFiles []string) error {
 		caCert, ok := config.clientCasBySubjectKeyId[crlIssuerId]
 
 		if !ok {
-			log.Printf("warn: CRL loaded for issuer '%s' but no such CA loaded: ignoring it", hex.EncodeToString([]byte(crlIssuerId)))
-			fmt.Printf("%#v loaded certs\n", len(config.clientCasBySubjectKeyId))
+			log.Warnf("CRL loaded for issuer '%s' but no such CA loaded: ignoring it", hex.EncodeToString([]byte(crlIssuerId)))
+			log.Infof("%#v loaded certs\n", len(config.clientCasBySubjectKeyId))
 			continue
 		}
 
 		// At this point, we have the CA certificate and the CRL. All that's left before evicting the CRL we currently trust is to verify the new CRL's signature
 		err = caCert.CheckCRLSignature(certList)
 		if err != nil {
-			fmt.Printf("error: Could not trust CRL. Error during signature check: %#v\n", err)
+			log.Errorf("Could not trust CRL. Error during signature check: %#v", err)
 			continue
 		}
 
 		// At this point, we have a new CRL which we trust. Let's evict the old one.
 		config.CrlByAuthorityKeyId[crlIssuerId] = certList
-		fmt.Printf("info: Loaded CRL for Authority ID '%s'\n", hex.EncodeToString([]byte(crlIssuerId)))
+		log.Infof("Loaded CRL for Authority ID '%s'", hex.EncodeToString([]byte(crlIssuerId)))
 	}
 
 	// Verify that all CAs loaded have a CRL
