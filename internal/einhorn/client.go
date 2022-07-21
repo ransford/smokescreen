@@ -13,7 +13,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var TmpDir = "/tmp"
+const TmpDir = "/tmp"
 
 type Client struct {
 	socket net.Conn
