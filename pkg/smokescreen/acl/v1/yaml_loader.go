@@ -68,7 +68,7 @@ func (cfg *YAMLConfig) Load() (*ACL, error) {
 	}
 
 	if cfg.Services == nil {
-		return nil, errors.New("Top level list 'services' is missing")
+		return nil, errors.New("top level list 'services' is missing")
 	}
 
 	for _, v := range cfg.Services {

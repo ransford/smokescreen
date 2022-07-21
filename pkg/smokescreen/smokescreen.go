@@ -226,7 +226,7 @@ func safeResolve(config *Config, network, addr string) (*net.TCPAddr, string, er
 	if classification.IsAllowed() {
 		return resolved, classification.String(), nil
 	}
-	return nil, "destination address was denied by rule, see error", denyError{fmt.Errorf("The destination address (%s) was denied by rule '%s'", resolved.IP, classification)}
+	return nil, "destination address was denied by rule, see error", denyError{fmt.Errorf("the destination address (%s) was denied by rule '%s'", resolved.IP, classification)}
 }
 
 func proxyContext(ctx context.Context) (*goproxy.ProxyCtx, bool) {

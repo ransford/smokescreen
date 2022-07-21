@@ -271,7 +271,7 @@ func (config *Config) SetupCrls(crlFiles []string) error {
 		caCert, ok := config.clientCasBySubjectKeyId[crlIssuerId]
 
 		if !ok {
-			log.Printf("warn: CRL loaded for issuer '%s' but no such CA loaded: ignoring it\n", hex.EncodeToString([]byte(crlIssuerId)))
+			log.Printf("warn: CRL loaded for issuer '%s' but no such CA loaded: ignoring it", hex.EncodeToString([]byte(crlIssuerId)))
 			fmt.Printf("%#v loaded certs\n", len(config.clientCasBySubjectKeyId))
 			continue
 		}
@@ -346,7 +346,7 @@ func addCertsFromFile(config *Config, pool *x509.CertPool, fileName string) erro
 	}
 	ok := pool.AppendCertsFromPEM(data)
 	if !ok {
-		return fmt.Errorf("Failed to load any certificates from file '%s'", fileName)
+		return fmt.Errorf("failed to load any certificates from file '%s'", fileName)
 	}
 	return nil
 }
