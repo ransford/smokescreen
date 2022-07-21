@@ -256,7 +256,8 @@ func (config *Config) SetupCrls(crlFiles []string) error {
 				var crlAuthorityKey authKeyId
 				_, err := asn1.Unmarshal(v.Value, &crlAuthorityKey)
 				if err != nil {
-					fmt.Printf("error: Failed to read AuthorityKey: %#v\n", err)
+					log.Errorf("error: Failed to read AuthorityKey: %#v", err)
+					// TODO(ransford): continue, or exit early?
 					continue
 				}
 				crlIssuerId = string(crlAuthorityKey.Id)
@@ -293,7 +294,7 @@ func (config *Config) SetupCrls(crlFiles []string) error {
 	for k := range config.clientCasBySubjectKeyId {
 		_, ok := config.CrlByAuthorityKeyId[k]
 		if !ok {
-			fmt.Printf("warn: no CRL loaded for Authority ID '%s'\n", hex.EncodeToString([]byte(k)))
+			log.Warnf("no CRL loaded for Authority ID '%s'", hex.EncodeToString([]byte(k)))
 		}
 	}
 	return nil
@@ -301,7 +302,7 @@ func (config *Config) SetupCrls(crlFiles []string) error {
 
 func (config *Config) SetupStatsdWithNamespace(addr, namespace string) error {
 	if addr == "" {
-		fmt.Println("warn: no statsd addr provided, using noop client")
+		log.Warn("no statsd addr provided, using noop client")
 		config.MetricsClient = NewNoOpMetricsClient()
 		return nil
 	}
@@ -401,7 +402,7 @@ func (config *Config) populateClientCaMap(pemCerts []byte) (ok bool) {
 		if err != nil {
 			continue
 		}
-		fmt.Printf("info: Loaded CA with Authority ID '%s'\n", hex.EncodeToString(cert.SubjectKeyId))
+		log.Infof("Loaded CA with Authority ID '%s'", hex.EncodeToString(cert.SubjectKeyId))
 		config.clientCasBySubjectKeyId[string(cert.SubjectKeyId)] = cert
 		ok = true
 	}
